@@ -8,6 +8,7 @@ const App = () => {
     { id: 1, title: "One", body: "Description..." },
     { id: 2, title: "Two", body: "Description..." },
   ]);
+  const [selectedSort, setSelectedSort] = useState("");
 
   const create = (posts) => {
     const newPost = {
@@ -21,11 +22,17 @@ const App = () => {
   const remove = (posts) => {
     setPost([...post].filter((item) => item.id !== posts.id));
   };
+  const sortPosts = (sort) => {
+    setSelectedSort(sort);
+    setPost([...post].sort((a, b) => a[sort].localeCompare(b[sort])));
+  };
 
   return (
     <div>
       <CreatePosts create={create} />
       <Select
+        onChange={sortPosts}
+        value={selectedSort}
         defaultValue="Сортировка"
         options={[
           { value: "title", name: "По заголовку" },
