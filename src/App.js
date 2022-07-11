@@ -1,26 +1,30 @@
 import React, { useState, useMemo } from "react";
 import CreatePosts from "./CreatePosts";
-import Select from "./Component/UI/select/Select";
 import PostList from "./PostList";
-import Input from "./Component/UI/input/Input";
+import PostFilter from "./Component/PostFilter";
 
 const App = () => {
   const [post, setPost] = useState([
     { id: 1, title: "One", body: "Description..." },
     { id: 2, title: "Two", body: "Description..." },
   ]);
-  const [selectedSort, setSelectedSort] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState({ sort: "", query: "" });
 
   const sortedPosts = useMemo(() => {
-    if (selectedSort) {
-      console.log("One");
+    if (filter.sort) {
       return [...post].sort((a, b) =>
-        a[selectedSort].localeCompare(b[selectedSort])
+        a[filter.sort].localeCompare(b[filter.sort])
       );
     }
     return post;
-  }, [selectedSort, post]);
+  }, [filter.sort, post]);
+
+  const sortedAndSearchedPosts = useMemo(() => {
+    return sortedPosts.filter((post) =>
+      post.title.toLowerCase().includes(filter.query.toLowerCase())
+    );
+  }, [filter.query, filter.sort, post]);
+
   const create = (posts) => {
     const newPost = {
       id: Date.now(),
@@ -33,32 +37,11 @@ const App = () => {
   const remove = (posts) => {
     setPost([...post].filter((item) => item.id !== posts.id));
   };
-  const sortPosts = (sort) => {
-    setSelectedSort(sort);
-  };
-  const sortedAndSearchedPosts = useMemo(() => {
-    return sortedPosts.filter((post) =>
-      post.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [searchQuery, sortPosts]);
 
   return (
     <div>
       <CreatePosts create={create} />
-      <Input
-        placeholder="Search..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-      <Select
-        onChange={sortPosts}
-        value={selectedSort}
-        defaultValue="Сортировка"
-        options={[
-          { value: "title", name: "По заголовку" },
-          { value: "body", name: "По описанию" },
-        ]}
-      />
+      <PostFilter filter={filter} setFilter={setFilter} />
       {sortedAndSearchedPosts.length ? (
         <PostList post={sortedAndSearchedPosts} remove={remove} />
       ) : (
