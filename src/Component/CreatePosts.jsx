@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import Button from "./Component/UI/button/Button";
-import Input from "./Component/UI/input/Input";
+import Button from "./UI/button/Button";
+import Input from "./UI/input/Input";
 
 const CreatePosts = ({ create }) => {
   const [posts, setPosts] = useState({ title: "", body: "" });
   return (
-    <div>
+    <div className="post-create">
       <Input
         type="text"
         placeholder="Title..."

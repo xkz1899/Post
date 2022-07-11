@@ -1,9 +1,9 @@
 import React from "react";
-import Button from "./Component/UI/button/Button";
+import Button from "./UI/button/Button";
 
 const RenderPost = ({ post, remove }) => {
   return (
-    <div>
+    <>
       <div className="post">
         <div className="post__block">
           <h1>{post.title}</h1>
@@ -11,7 +11,7 @@ const RenderPost = ({ post, remove }) => {
         </div>
         <Button onClick={(e) => remove(post)}>Удалить</Button>
       </div>
-    </div>
+    </>
   );
 };
 

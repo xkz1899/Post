@@ -1,13 +1,17 @@
 import React, { useState, useMemo } from "react";
-import CreatePosts from "./CreatePosts";
-import PostList from "./PostList";
+import CreatePosts from "./Component/CreatePosts";
 import PostFilter from "./Component/PostFilter";
+import PostList from "./Component/PostList";
+import Modal from "./Component/Modal/Modal";
+import Button from "./Component/UI/button/Button";
 
 const App = () => {
   const [post, setPost] = useState([
     { id: 1, title: "One", body: "Description..." },
     { id: 2, title: "Two", body: "Description..." },
   ]);
+  const [modal, setModal] = useState(false);
+
   const [filter, setFilter] = useState({ sort: "", query: "" });
 
   const sortedPosts = useMemo(() => {
@@ -33,15 +37,23 @@ const App = () => {
     setPost([...post, newPost]);
     posts.title = "";
     posts.body = "";
+    setModal(false);
   };
   const remove = (posts) => {
     setPost([...post].filter((item) => item.id !== posts.id));
   };
 
   return (
-    <div>
-      <CreatePosts create={create} />
+    <div className="container">
+      <Button style={{ marginTop: 30 }} onClick={() => setModal(true)}>
+        Создать новый пост
+      </Button>
+      <hr />
+      <Modal visible={modal} setVisible={setModal}>
+        <CreatePosts create={create} />
+      </Modal>
       <PostFilter filter={filter} setFilter={setFilter} />
+      <hr />
       {sortedAndSearchedPosts.length ? (
         <PostList post={sortedAndSearchedPosts} remove={remove} />
       ) : (
