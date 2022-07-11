@@ -1,33 +1,23 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import CreatePosts from "./Component/CreatePosts";
 import PostFilter from "./Component/PostFilter";
 import PostList from "./Component/PostList";
 import Modal from "./Component/Modal/Modal";
 import Button from "./Component/UI/button/Button";
+import { usePosts } from "./hooks/useHooks";
+import PostService from "./API/PostService";
+import Loader from "./Component/UI/loader/Loader";
 
 const App = () => {
-  const [post, setPost] = useState([
-    { id: 1, title: "One", body: "Description..." },
-    { id: 2, title: "Two", body: "Description..." },
-  ]);
-  const [modal, setModal] = useState(false);
-
+  const [post, setPost] = useState([]);
   const [filter, setFilter] = useState({ sort: "", query: "" });
+  const [modal, setModal] = useState(false);
+  const sortedAndSearchedPosts = usePosts(post, filter.sort, filter.query);
+  const [isPostsLoading, setIsPostsLoading] = useState(false);
 
-  const sortedPosts = useMemo(() => {
-    if (filter.sort) {
-      return [...post].sort((a, b) =>
-        a[filter.sort].localeCompare(b[filter.sort])
-      );
-    }
-    return post;
-  }, [filter.sort, post]);
-
-  const sortedAndSearchedPosts = useMemo(() => {
-    return sortedPosts.filter((post) =>
-      post.title.toLowerCase().includes(filter.query.toLowerCase())
-    );
-  }, [filter.query, filter.sort, post]);
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
   const create = (posts) => {
     const newPost = {
@@ -39,6 +29,13 @@ const App = () => {
     posts.body = "";
     setModal(false);
   };
+
+  async function fetchPosts() {
+    setIsPostsLoading(true);
+    const response = await PostService.getAll();
+    setPost(response.data);
+    setIsPostsLoading(false);
+  }
   const remove = (posts) => {
     setPost([...post].filter((item) => item.id !== posts.id));
   };
@@ -54,10 +51,14 @@ const App = () => {
       </Modal>
       <PostFilter filter={filter} setFilter={setFilter} />
       <hr />
-      {sortedAndSearchedPosts.length ? (
-        <PostList post={sortedAndSearchedPosts} remove={remove} />
+      {isPostsLoading ? (
+        <div
+          style={{ display: "flex", justifyContent: "center", marginTop: 50 }}
+        >
+          <Loader />
+        </div>
       ) : (
-        <h1>Постов не найдено!</h1>
+        <PostList post={sortedAndSearchedPosts} remove={remove} />
       )}
     </div>
   );

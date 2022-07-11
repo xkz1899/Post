@@ -4,9 +4,13 @@ import RenderPost from "./RenderPost";
 const PostList = ({ post, remove }) => {
   return (
     <>
-      {post.map((item, index) => (
-        <RenderPost key={Date.now() + index} post={item} remove={remove} />
-      ))}
+      {post.length ? (
+        post.map((item) => (
+          <RenderPost key={post.id} post={item} remove={remove} />
+        ))
+      ) : (
+        <h1>Постов не найдено!</h1>
+      )}
     </>
   );
 };
